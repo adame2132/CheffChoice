@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/56bc9c2d67.js" crossorigin="anonymous"></script>
+    <title>Chef's Choice</title>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <div v-if="loggedIn == false" id="loginHero">
+            <!-- <div id="loginHero">
+                <img src="images/logginBackground.avif" alt="">
+            </div> -->
+            <div id="loginModal">
+                <div v-if="loginmodal">
+                    <div class="LoginMenu">
+                        <h1>Login</h1>
+                    </div>
+                    <div class="errors">
+                        <div v-for="error in validate">
+                             {{error}}
+                        </div>
+                    </div>
+                    <div id="LoginInput">
+                        <div class="aline">
+                            <i class="fa-solid fa-envelope fa-2x"></i>
+                            <input type="email" placeholder="Enter your Email" class="better" v-model = "email" :class="{error:validate.includes('Email is Required') || validate.includes('Email must contain a @')}">
+                        </div>
+                        <div class="aline">
+                            <i class="fa-solid fa-lock fa-2x"></i>
+                            <input type="password" placeholder="Enter Password" class="better" v-model = "attempt" :class="{error:validate.includes('Password is Required')}">
+                        </div>
+                        <button id="loginBtn" v-on:click="createSession">Login</button>
+                        <p id="dontHave" v-on:click="showSignup">Dont have an Account?</p>
+                    </div>
+                </div>
+                <div v-if="signupmodal">
+                    <div class="LoginMenu">
+                        <div id="backArrow" v-on:click="showLogin">
+                            <img src="images/backarrow.png" alt="">
+                        </div>
+                        <h1>Sign Up</h1>
+                    </div>
+                    <!-- <div v-for="error in validate">
+                        {{error}}
+                    </div> -->
+                    <div class="errorsTwo" v-if="validate.length > 0">
+                        <div>
+                            <p>Please correct any errors in the following boxes</p>
+                        </div>
+                    </div>
+                    <div id="signupForm">
+                        <div class="signupRow">
+                            <input type="text" placeholder="Enter First Name " class="two"v-model="fname" :class= "{error: validate.includes('First Name Required')}">
+                            <input type="text" placeholder="Enter Last Name " class="two" v-model="lname" :class="{error: validate.includes('Last Name Required')}">
+                        </div>
+                        <div id="threeWay">
+                            <input type="text" placeholder="Enter Your Address" id="address" v-model="address" :class="{error: validate.includes('Street Address Required')}">
+                            <input type="text" placeholder="Enter Zip Code" id="zip" v-model="zip" :class="{error: validate.includes('Zip Code Required')}">
+                                <!-- select a city drop down and country dropsown -->
+                            <select name="state" id="state" v-model="state" :class="{error: validate.includes('State Required')}">
+                                <div id="dropdown">
+                                    <option  value="">Please Select a State</option>
+                                    <option v-for="i in states" :value="i">{{i}}</option >
+                                </div>
+                            </select>
+                        </div>
+                        <div class="signupRow">
+                            <input type="email" placeholder="Enter your Email" id="email" v-model="email" :class="{error: validate.includes('Email Required') || validate.includes('Email Requires a @')}">
+                        </div>
+                        <div class="signupRow">
+                            <input type="password" placeholder="Enter A Password" class="two" v-model="plainPass" :class="{error: validate.includes('Password Required')}">
+                            <input type="password" placeholder="Confirm Password" class="two" v-model="confirmPass" :class="{error: validate.includes('Please Confirm Password') || validate.includes('Please Confirm Password correctly')}">
+                        </div>
+                        <div class="signupRow">
+                            <button id="registerBtn" v-on:click="createUser">Register</button>
+                        </div>
+                        <!-- might move up  -->
+                        <div class="signupRow">
+                            <!-- <button id="registerBtn" v-on:click="showLogin">Already Have an account?</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="loggedIn == true">
+            <div id="banner">
+                <div id="bannerLineup">
+                    <div id="logo">
+                        <img src="images/chef-logo.png" alt="">
+                    </div>
+                    <div id="title">
+                        <h1>Chef's Choice</h1>
+                    </div>
+                    <div id="nav">
+                        <div id="logout" v-on:click="Logout">
+                            <img src="images/logout.png" alt="">
+                        </div>
+                        <nav>
+                            <ul>
+                                <button @click="currentPage = 'Recipeies'" class="menu">Recipes</button>
+                                <!-- <button @click="currentPage = 'Preps'" class="menu">Preps</button> -->
+                                    <!-- <button @click="currentPage = 'Shopping_List'">Shopping List</button> -->
+                                <button @click="openShopingModal" class="menu">Shopping List</button>
+                                <button @click="currentPage = 'Profile'" class="menu">Profile</button>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="display">
+                    <!-- this is the end of my banner now ill start the page details. -->
+    <!-- start of profile page  -->
+                <div v-if="currentPage ==='Profile'">
+                    <div id="profileLayout">
+                        <div id="userLayout">
+                            <div id="userID">
+                                <h2 class="profileTitle">User</h2>
+                                <div id="userIDcontent">
+                                    <!-- image 
+                                    fname lname 
+                                    role  -->
+                                    <div id="userImage">
+                                        <img src="images/profile.png" alt="">
+                                    </div>
+                                    <div class="twoWayname">
+                                        <div class="usernameFeild">{{user.fname}}</div>
+                                        <div class="usernameFeild">{{user.lname}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">Status:</div>
+                                        <div class="userFeild">{{user.role}}</div>
+                                    </div>
+                                    <!-- <div v-model="user">
+                                        <div class="userline">
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div id="userInfo">
+                                <h2 class="profileTitle">User Info</h2>
+                                <div id="tabelDetails">
+                                    <div class="twoWay">
+                                        <div class="userheader">First Name:</div>
+                                        <div class="userFeild">{{user.fname}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">Last Name:</div>
+                                        <div class="userFeild">{{user.lname}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">Address:</div>
+                                        <div class="userFeild">{{user.address}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">Zip code:</div>
+                                        <div class="userFeild">{{user.zip}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">State:</div>
+                                        <div class="userFeild">{{user.state}}</div>
+                                    </div>
+                                    <div class="twoWay">
+                                        <div class="userheader">Email:</div>
+                                        <div class="userFeild">{{user.email}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="userRecipes">
+                            <h2 class="profileTitle">Created Recipes</h2>
+                            <div class="all">
+                                <div v-for= "r in userRecipes" class="recipeContainer">
+                                    <div class="rItem">
+                                        <div class="foodImg">
+                                            <img src="images/defualt.jpg" alt="">
+                                            <button v-on:click="deleteDish(r._id)" class="deleteBtn"><i class="fa-solid fa-xmark"></i></button>
+                                            <button v-on:click="openAndLoad(r._id)"class="viewBtn">View Recipe</button>
+                                            <div class="viewRecipeModal" v-if="viewRecipeMoadal">
+                                                <button v-on:click="closeViewRecipeModal" class="closeBtn">Close</button>
+                                                <div class="outter">
+                                                    <div class="wrapper">
+                                                        <div class="clickedFoodImg">
+                                                            <img src="images/defualt.jpg" alt="">
+                                                        </div>
+                                                        <div class="titleCal">
+                                                            <div>{{dish.title}}</div>
+                                                            <div>{{dish.calories}} calories</div>
+                                                        </div>
+                                                        <div class="listI">
+                                                            <div class="iLineup">
+                                                                <div class="top"> Item name</div>
+                                                                <div class="top">Item Quantity</div>
+                                                                <div class="top">Item Unit</div>
+                                                            </div>
+                                                            <div v-for=" i in dish.ingredients" class="iLineup">
+                                                                <div><strong>{{i.name}}</strong></div>
+                                                                <div><strong>{{i.qty}}</strong></div>
+                                                                <div><strong>{{i.unit}}</strong></div>
+                                                            </div>
+                                                        </div>
+                                                        <button v-on:click="showAddInput" v-show="!showAdd" id="preBtn">Add Ingredient</button>
+                                                    </div>
+                                                    <div class="wrapper2">
+                                                        <div v-show="showAdd" id="hidden">
+                                                            <h2 id="titleAddIngredient">Add Ingredients to Recipe</h2>
+                                                            <div class="validation">
+                                                                <p  v-for="i in validate">{{i}}</p>
+                                                            </div>
+                                                            <div id="inputBrown">
+                                                                <input type="text" placeholder="enter ingredient name" v-model="name" class="ingredientInput">
+                                                                <input type="text"placeholder="enter qty" v-model="qty" class="ingredientInput">
+                                                                <input type="text" placeholder="enter unit" v-model="unit" class="ingredientInput">
+                                                                <button v-on:click="createIngredient(dish._id)"id="hiddenBtn">Add Ingredient</button>
+                                                            </div>
+                                                        </div>
+                                                        <div v-show="!showAdd">
+                                                            <h2 class="instructionsTitle">Recipe</h2>
+                                                            <div class="instructions">
+                                                                <textarea name="desc" id="instructionsInput" cols="35" rows="17" placeholder="Start Your Recipe" :disabled = "disableEdit" v-model="dish.desc"></textarea>
+                                                                <button id="saveBtn" v-show="disableEdit == false" v-on:click="updateDish(dish._id)">Save Changes</button>
+                                                            </div>
+                                                            <button id="editRecipeBtn" v-on:click="disableEdit = false">Edit Recipe</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="label">
+                                            <div class="front">{{r.title}}</div>
+                                            <div class="front">{{r.calories}} calories</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <button v-on:click="Logout">Logout</button> -->
+                    </div>
+                </div>
+                <!-- start of Recipies page -->
+                <div v-if="currentPage === 'Recipeies'">
+                    <!-- <h2>create recipe </h2>
+                    <input type="text" placeholder="enter the recipe name" v-model = "title">
+                    <input type="text" placeholder="Enter thr calorie count" v-model="calories">
+                    <button v-on:click="createRecipe">create recipe</button>
+                    <h2>add ingredients to recipe</h2>
+                    <input type="text" placeholder="enter ingredient name" v-model="name">
+                    <input type="text"placeholder="enter qty" v-model="qty">
+                    <input type="text" placeholder="enter unit" v-model="unit"> -->
+                    <div class="RecipeBack">
+                        <div id="options">
+                            <div id="search">
+                                <input type="text" placeholder="search for a recipe" id="searchInput" v-model="search">
+                                <!-- <button v-on:click="searchRecipes"id="searchBtn">Search</button> -->
+                            </div>
+                            <button v-on:click="openAddBtnModal" id="addBtn">Add +</button>
+                            <div id="addBtnModal" v-if="addBtnModal"> 
+                                <button v-on:click="closeAddBtnModal" class="closeBtn">close</button>
+                                <h2 id="createRecipeTittle">Create Your Recipe</h2>
+                                <ul class="validation">
+                                    <li v-for="i in validate">{{i}}</li>
+                                </ul>
+                                <div id="addInputWrapper">
+                                    <input type="text" placeholder="enter the recipe name" v-model = "title" class="addInput">
+                                    <input type="text" placeholder="Enter the calorie count" v-model="calories" class="addInput">
+                                </div>
+                                <button v-on:click="createRecipe" id="CreateBtn">Create Recipe</button>
+                            </div>
+                        </div>
+                        <div class="all">
+                            <div v-for= "r in recipies" class="recipeContainer">
+                                <div class="rItem">
+                                    <div class="foodImg">
+                                        <img src="images/defualt.jpg" alt="">
+                                         <!-- getting the id form the iteration of recipies and sending to my function  -->
+                                        <!-- <button v-on:click="createIngredient(r._id)" class="viewBtn">add ingredients</button> -->
+                                        <!-- <button v-on:click="deleteDish(r._id)" class="deleteBtn"><i class="fa-solid fa-xmark"></i></button> -->
+                                        <button v-on:click="openAndLoad(r._id)"class="viewBtn">View Recipe</button>
+                                        <div class="viewRecipeModal" v-if="viewRecipeMoadal">
+                                            <button v-on:click="closeViewRecipeModal" class="closeBtn">Close</button>
+                                            <div class="outter">
+                                                <div class="wrapper">
+                                                    <div class="clickedFoodImg">
+                                                        <img src="images/defualt.jpg" alt="">
+                                                    </div>
+                                                    <div class="titleCal">
+                                                        <div>{{dish.title}}</div>
+                                                        <div>{{dish.calories}} calories</div>
+                                                    </div>
+                                                    <div class="listI">
+                                                        <div class="iLineup">
+                                                            <div class="top"> Item name</div>
+                                                            <div class="top">Item Quantity</div>
+                                                            <div class="top">Item Unit</div>
+                                                        </div>
+                                                        <div v-for=" i in dish.ingredients" class="iLineup">
+                                                            <div><strong>{{i.name}}</strong></div>
+                                                            <div><strong>{{i.qty}}</strong></div>
+                                                            <div><strong>{{i.unit}}</strong></div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <button v-on:click="createIngredient(dish._id)" class="viewBtn">add ingredients</button> -->
+                                                    <!-- <button v-on:click="showAddInput" v-show="!showAdd" id="preBtn">Add Ingredient</button> -->
+                                                    <!-- <div v-show="showAdd" id="hidden">
+                                                        <h2 id="titleAddIngredient">Add ingredients to recipe</h2>
+                                                        <input type="text" placeholder="enter ingredient name" v-model="name" class="ingredientInput">
+                                                        <input type="text"placeholder="enter qty" v-model="qty" class="ingredientInput">
+                                                        <input type="text" placeholder="enter unit" v-model="unit" class="ingredientInput">
+                                                        <button v-on:click="hideAddInput(dish._id)"id="hiddenBtn">Add Ingredient</button>
+                                                    </div> -->
+                                                </div>
+                                                <div class="wrapper2">
+                                                    <!-- <div v-show="showAdd" id="hidden">
+                                                        <h2 id="titleAddIngredient">Add Ingredients to Recipe</h2>
+                                                        <div class="validation">
+                                                            <p  v-for="i in validate">{{i}}</p>
+                                                        </div>
+                                                        <div id="inputBrown">
+                                                            <input type="text" placeholder="enter ingredient name" v-model="name" class="ingredientInput">
+                                                            <input type="text"placeholder="enter qty" v-model="qty" class="ingredientInput">
+                                                            <input type="text" placeholder="enter unit" v-model="unit" class="ingredientInput">
+                                                            <button v-on:click="createIngredient(dish._id)"id="hiddenBtn">Add Ingredient</button>
+                                                        </div>
+                                                    </div> -->
+                                                    <div v-show="!showAdd">
+                                                        <h2 class="instructionsTitle">Recipe</h2>
+                                                        <div class="instructions">
+                                                            <textarea name="desc" id="instructionsInput" cols="35" rows="17" placeholder="Start Your Recipe" :disabled = "disableEdit" v-model="dish.desc"></textarea>
+                                                            <!-- <button id="saveBtn" v-show="disableEdit == false" v-on:click="updateDish(dish._id)">Save Changes</button> -->
+                                                        </div>
+                                                        <!-- <button id="editRecipeBtn" v-on:click="disableEdit = false">Edit Recipe</button> -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="label">
+                                        <div class="front">{{r.title}}</div>
+                                        <div class="front">{{r.calories}} calories</div>
+                                    </div>
+                                    <!-- <div v-for="i in r.ingredients" class="iItem">
+                                        <div><strong>Ingredient Name: </strong> {{ i.name }}</div>
+                                        <div><strong>Quantity: </strong> {{ i.qty }}</div>
+                                        <div><strong>Unit: </strong> {{ i.unit }}</div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- start of prep Page -->
+                <div v-if="currentPage === 'Preps'">
+                    <div id="prepBack">
+                        <div id="wrapper3">
+                            <div id="calendar">
+                                <!-- <h2 id="calendarTitle">Calendar</h2> -->
+                                <div id="row">
+                                    <button v-on:click="prevMonth" id="backBtn">Prev</button>
+                                    <div id="month">{{ monthsArray[index] }}</div>
+                                    <button v-on:click="nextMonth" id="nextBtn">Next</button>
+                                </div>
+                                <div id="calendarBox">
+                                    <button v-for="day in daysInMonths[index]" class="day" v-on:click="getDay(monthsArray[index], day)">{{ day }}></button>
+                                </div>
+                                <button id="addPrepBtn">Add A Meal</button>
+                            </div>
+                            <div id="displayMeals">
+                                <h2 id="mealsTitle">Meal Preps</h2>
+                                <div id="mealsContainer">
+                                    <h2>not working yet</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- start of shoppiong list -->
+                <div class="blur" v-if="blur === true"></div>
+                <div id="shoppingModal" v-if="shoppingModal === true">
+                    <button v-on:click="closeShoppingModal" v-on:click="" class="closeBtn">Close</button>
+                    <h1 id="ShopingListTitle">Shopping List</h1>
+                    <div id="listWrapper">
+                        <div class="iLineup">
+                            <div class="top"> Item name</div>
+                            <div class="top">Item Quantity</div>
+                            <div class="top">Item Unit</div>
+                            <div></div>
+                        </div>
+                        <div v-for=" i in ingredients" class="iLineup">
+                            <div class="name"><strong>{{i.name}}</strong></div>
+                            <div class="qty"><strong>{{i.qty}}</strong></div>
+                            <div class="unit"><strong>{{i.unit}}</strong></div>
+                            <button v-on:click = "deleteIngredient(i._id)" id="itemDeleteBtn">Delete item</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div> 
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
